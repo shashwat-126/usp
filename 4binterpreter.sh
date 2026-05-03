@@ -4,3 +4,4 @@
 ./echoall "FromInterpreter" "$1"
 
 #make executable using - chmod +x interpreter.sh
+#sed -i 's/\r$//' interpreter.sh
