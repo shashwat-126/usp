@@ -1,0 +1,17 @@
+#include <stdio.h>
+#include <unistd.h>
+#include <sys/wait.h>
+
+int main() {
+    pid_t pid = fork();
+
+    if (pid > 0) {
+        wait(NULL);  // Collect child status
+        printf("Child terminated, no zombie\n");
+    } 
+    else if (pid == 0) {
+        printf("Child exiting...\n");
+    }
+
+    return 0;
+}

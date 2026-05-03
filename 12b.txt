@@ -1,0 +1,47 @@
+#include <stdio.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+
+int main() {
+    pid_t pid = fork();
+
+    if (pid < 0) {
+        perror("fork failed");
+        return 1;
+    }
+
+    if (pid == 0) {
+        // Child process
+        printf("\nChild Process (PID: %d)\n", getpid());
+
+        // Custom environment variables
+        char *envp[] = {
+            "USER=CustomUser",
+            "PATH=/custom/bin",
+            "HOME=/custom/home",
+            NULL
+        };
+
+        execle("./echoall", "echoall", "ChildArg1", NULL, envp);
+        perror("execle failed");
+    } 
+    else {
+        // Parent process
+        printf("\nParent Process (PID: %d)\n", getpid());
+
+        wait(NULL);
+
+        // Parent uses default environment
+        execl("./echoall", "echoall", "ParentArg1", NULL);
+
+        perror("execl failed");
+    }
+
+    return 0;
+}
+
+//gcc echoall.c -o echoall
+//gcc main.c -o main
+
+//./main

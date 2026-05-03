@@ -1,0 +1,41 @@
+#include <stdio.h>
+#include <unistd.h>
+
+int main(int argc, char *argv[]) {
+
+    if (argc != 2) {
+        printf("Usage: %s <filename>\n", argv[0]);
+        return 1;
+    }
+
+    char *file = argv[1];
+
+    printf("\nChecking access permissions for: %s\n", file);
+
+    if (access(file, F_OK) == 0)
+        printf("File exists\n");
+    else
+        printf("File does not exist\n");
+
+    if (access(file, R_OK) == 0)
+        printf("Readable\n");
+    else
+        printf("Not readable\n");
+
+    if (access(file, W_OK) == 0)
+        printf("Writable\n");
+    else
+        printf("Not writable\n");
+
+    if (access(file, X_OK) == 0)
+        printf("Executable\n");
+    else
+        printf("Not executable\n");
+
+    return 0;
+}
+
+//gcc access_check.c -o access_check
+//gcc parent.c -o parent
+
+//./parent

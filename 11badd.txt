@@ -1,0 +1,22 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+int main(int argc, char *argv[]) {
+
+    if (argc != 3) {
+        printf("Usage: %s <num1> <num2>\n", argv[0]);
+        return 1;
+    }
+
+    int a = atoi(argv[1]);
+    int b = atoi(argv[2]);
+
+    printf("Addition: %d + %d = %d\n", a, b, a + b);
+
+    return 0;
+}
+
+//gcc add.c -o add
+//gcc parent.c -o parent
+
+//./parent
