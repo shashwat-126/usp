@@ -1,0 +1,1977 @@
+https://chatgpt.com/share/69f6409f-2c18-8323-a82d-3c388bc3a7e5
+
+Write a C program to display the file content in reverse order using lseek
+system call.
+b) Write a C program to create a child process and show how parent
+and child processes will share the text file and justify that both
+parent and child share the same file offset.
+
+Here are clean, working C programs for both parts of your question.
+
+(a) Display file content in reverse using lseek()
+✅ Concept
+lseek() moves the file pointer.
+
+Start from the end and move backwards one byte at a time.
+
+💻 Code
+#include <stdio.h>
+#include <fcntl.h>
+#include <unistd.h>
+
+int main() {
+    int fd;
+    char ch;
+
+    fd = open("sample.txt", O_RDONLY);
+    if (fd < 0) {
+        perror("Error opening file");
+        return 1;
+    }
+
+    // Move to end of file
+    off_t size = lseek(fd, 0, SEEK_END);
+
+    // Traverse backwards
+    for (off_t i = size - 1; i >= 0; i--) {
+        lseek(fd, i, SEEK_SET);
+        read(fd, &ch, 1);
+        write(STDOUT_FILENO, &ch, 1);
+    }
+
+    close(fd);
+    return 0;
+}
+▶️ How it works
+lseek(fd, 0, SEEK_END) → go to file end
+
+Loop from end → start
+
+Read 1 byte → print
+
+(b) Parent & Child Sharing File Offset
+✅ Concept
+After fork(), both processes share the same file descriptor
+
+So they also share the same file offset
+
+If one reads → offset moves for both
+
+💻 Code
+#include <stdio.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <sys/types.h>
+
+int main() {
+    int fd;
+    char buffer[10];
+
+    fd = open("sample.txt", O_RDONLY);
+    if (fd < 0) {
+        perror("Error opening file");
+        return 1;
+    }
+
+    pid_t pid = fork();
+
+    if (pid < 0) {
+        perror("Fork failed");
+        return 1;
+    }
+
+    // Parent process
+    if (pid > 0) {
+        read(fd, buffer, 5);
+        buffer[5] = '\0';
+        printf("Parent read: %s\n", buffer);
+
+        sleep(1); // ensure order
+    }
+    // Child process
+    else {
+        sleep(1); // wait for parent
+
+        read(fd, buffer, 5);
+        buffer[5] = '\0';
+        printf("Child read: %s\n", buffer);
+    }
+
+    close(fd);
+    return 0;
+}
+▶️ Expected Output (Example)
+If sample.txt contains:
+
+ABCDEFGHIJ
+Output:
+
+Parent read: ABCDE
+Child read: FGHIJ
+🔥 Justification
+Parent reads first 5 bytes → offset moves to 5
+
+Child reads next 5 bytes → starts from offset 5
+➡️ proves shared file offset
+
+🚀 Key Takeaways
+lseek() enables random access in files
+
+fork() duplicates process but shares open file table
+
+Shared file descriptor ⇒ shared file offset
+
+If you want, I can also:
+
+convert this into exam-ready answers (with diagrams)
+
+or give Viva questions + answers for this topic 👍
+
+
+Write a C program to display various details of a file using stat
+structure (At least 5 fields).
+b) Write a C program to simulate system function
+
+Alright—here are clear, exam-ready C programs for both parts.
+
+(a) Display file details using stat structure
+✅ Concept
+The stat system call fills a structure with metadata about a file.
+
+💻 Code
+#include <stdio.h>
+#include <sys/stat.h>
+#include <time.h>
+
+int main() {
+    struct stat fileStat;
+
+    if (stat("sample.txt", &fileStat) < 0) {
+        perror("stat error");
+        return 1;
+    }
+
+    printf("File Size: %ld bytes\n", fileStat.st_size);
+    printf("Number of Links: %ld\n", fileStat.st_nlink);
+    printf("File inode: %ld\n", fileStat.st_ino);
+    printf("File Permissions: %o\n", fileStat.st_mode);
+    printf("User ID of owner: %d\n", fileStat.st_uid);
+
+    printf("Last Access Time: %s", ctime(&fileStat.st_atime));
+    printf("Last Modification Time: %s", ctime(&fileStat.st_mtime));
+
+    return 0;
+}
+▶️ Fields Explained (any 5 required)
+st_size → file size
+
+st_nlink → number of hard links
+
+st_ino → inode number
+
+st_mode → file permissions
+
+st_uid → owner user ID
+
+st_atime → last access time
+
+st_mtime → last modification time
+
+(b) Simulate system() function
+✅ Concept
+The system() function:
+
+Creates a child process (fork)
+
+Executes command using exec
+
+Parent waits for child
+
+💻 Code
+#include <stdio.h>
+#include <unistd.h>
+#include <sys/wait.h>
+
+int mysystem(const char *command) {
+    pid_t pid;
+    int status;
+
+    pid = fork();
+
+    if (pid < 0) {
+        return -1; // error
+    }
+
+    if (pid == 0) {
+        // Child process executes shell command
+        execl("/bin/sh", "sh", "-c", command, (char *)NULL);
+        _exit(127); // if exec fails
+    }
+
+    // Parent waits
+    wait(&status);
+    return status;
+}
+
+int main() {
+    mysystem("ls -l");
+    return 0;
+}
+▶️ How it Works
+fork() → creates child
+
+Child runs command using execl()
+
+Parent waits using wait()
+
+Returns exit status
+
+🔥 Key Points (Exam Gold)
+stat() retrieves file metadata without opening file
+
+system() internally uses:
+
+fork()
+
+exec()
+
+wait()
+
+Shared concept: process creation + execution
+
+If you want, I can also:
+
+Convert this into perfect 10-mark answer format
+
+Add diagram of process flow (fork → exec → wait)
+
+Give common viva questions professors ask from this
+
+
+Write a C program to remove empty files from the given directory.
+b) Write a C program to implement ls –li command which lists the
+files in a specified directory. Your program should Print 5 attributes
+of files.
+
+Here are clean, exam-ready solutions for both parts.
+
+(a) Remove empty files from a given directory
+✅ Concept
+Use opendir() to open directory
+
+Use readdir() to iterate files
+
+Use stat() to check file size
+
+If size = 0 → delete using remove()
+
+💻 Code
+#include <stdio.h>
+#include <dirent.h>
+#include <sys/stat.h>
+#include <string.h>
+
+int main() {
+    DIR *dir;
+    struct dirent *entry;
+    struct stat fileStat;
+    char path[1024];
+
+    dir = opendir(".");  // current directory
+    if (dir == NULL) {
+        perror("opendir failed");
+        return 1;
+    }
+
+    while ((entry = readdir(dir)) != NULL) {
+        // Skip . and ..
+        if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
+            continue;
+
+        snprintf(path, sizeof(path), "%s", entry->d_name);
+
+        if (stat(path, &fileStat) == 0) {
+            if (S_ISREG(fileStat.st_mode) && fileStat.st_size == 0) {
+                if (remove(path) == 0)
+                    printf("Removed empty file: %s\n", path);
+                else
+                    perror("remove failed");
+            }
+        }
+    }
+
+    closedir(dir);
+    return 0;
+}
+▶️ Key Points
+S_ISREG() ensures it's a regular file
+
+Only deletes files with st_size == 0
+
+Safe: skips directories
+
+(b) Implement ls -li (list files with inode + 5 attributes)
+✅ Concept
+ls -li shows inode number + file details
+
+Use stat() to fetch attributes
+
+💻 Code
+#include <stdio.h>
+#include <dirent.h>
+#include <sys/stat.h>
+#include <pwd.h>
+#include <grp.h>
+#include <time.h>
+
+int main() {
+    DIR *dir;
+    struct dirent *entry;
+    struct stat fileStat;
+
+    dir = opendir(".");
+    if (dir == NULL) {
+        perror("opendir failed");
+        return 1;
+    }
+
+    while ((entry = readdir(dir)) != NULL) {
+
+        if (stat(entry->d_name, &fileStat) == 0) {
+
+            printf("Inode: %ld\n", fileStat.st_ino);
+            printf("File Name: %s\n", entry->d_name);
+            printf("Size: %ld bytes\n", fileStat.st_size);
+            printf("Links: %ld\n", fileStat.st_nlink);
+            printf("Owner UID: %d\n", fileStat.st_uid);
+            printf("Last Modified: %s", ctime(&fileStat.st_mtime));
+            printf("---------------------------\n");
+        }
+    }
+
+    closedir(dir);
+    return 0;
+}
+▶️ Attributes Printed (≥ 5)
+Inode number → st_ino
+
+File name
+
+File size → st_size
+
+Number of links → st_nlink
+
+Owner ID → st_uid
+
+Last modification time → st_mtime
+
+🔥 Optional (Make it closer to real ls -li)
+You can also add:
+
+Permissions (st_mode)
+
+Group name (getgrgid)
+
+Owner name (getpwuid)
+
+🚀 Final Takeaways
+Directory handling → opendir(), readdir()
+
+File info → stat()
+
+File removal → remove()
+
+ls -li mainly = inode + metadata display
+
+If you want, I can upgrade this to:
+
+⭐ Exact Linux-like output format (permissions like -rw-r--r--)
+
+⭐ Command-line argument version (./program dir_name)
+
+⭐ Full viva + tricky edge cases (symbolic links, hidden files)
+
+
+. a) Write a C program to demonstrate the creation of soft links and
+hard links.
+b) Write a C program to
+i. To create a child process.
+ii. The child should execute an interpreter file by passing a few
+arguments
+iii. Create an interpreter file that has the path of echoall.c file and
+pass one argument
+iv. Create echoall.c file which prints the arguments received from
+both child process and interpreter file.
+
+Here’s a clear, exam-ready set of programs for both parts. I’ll keep them simple but correct, and also show how the files relate.
+
+(a) Create Soft Link and Hard Link
+✅ Concept
+Hard link → same inode as original file
+
+Soft link (symbolic link) → separate file pointing to original
+
+💻 Code
+#include <stdio.h>
+#include <unistd.h>
+
+int main() {
+
+    // Create a file first (manually or using system)
+    FILE *fp = fopen("original.txt", "w");
+    fprintf(fp, "Hello Links\n");
+    fclose(fp);
+
+    // Create hard link
+    if (link("original.txt", "hardlink.txt") == 0)
+        printf("Hard link created successfully\n");
+    else
+        perror("Hard link failed");
+
+    // Create soft link
+    if (symlink("original.txt", "softlink.txt") == 0)
+        printf("Soft link created successfully\n");
+    else
+        perror("Soft link failed");
+
+    return 0;
+}
+▶️ Key Observation
+Run:
+
+ls -li
+original.txt and hardlink.txt → same inode
+
+softlink.txt → different inode
+
+(b) Process + Interpreter + Argument Passing
+This part has 3 files:
+
+(i) Parent creates child process
+💻 main.c
+#include <stdio.h>
+#include <unistd.h>
+#include <sys/types.h>
+
+int main() {
+    pid_t pid = fork();
+
+    if (pid < 0) {
+        perror("Fork failed");
+        return 1;
+    }
+
+    if (pid == 0) {
+        // Child executes interpreter file
+        execl("./interpreter.sh", "interpreter.sh", "HelloFromChild", NULL);
+        perror("execl failed");
+    }
+
+    return 0;
+}
+(ii) Interpreter file
+💻 interpreter.sh
+#!/bin/sh
+
+# This script calls echoall executable
+./echoall "FromInterpreter" "$1"
+👉 Make it executable:
+
+chmod +x interpreter.sh
+(iii) echoall.c (prints all arguments)
+💻 echoall.c
+#include <stdio.h>
+
+int main(int argc, char *argv[]) {
+
+    printf("Total arguments received: %d\n", argc);
+
+    for (int i = 0; i < argc; i++) {
+        printf("Argument %d: %s\n", i, argv[i]);
+    }
+
+    return 0;
+}
+▶️ Compile & Run
+gcc echoall.c -o echoall
+gcc main.c -o main
+
+./main
+▶️ Expected Output (Example)
+Total arguments received: 3
+Argument 0: ./echoall
+Argument 1: FromInterpreter
+Argument 2: HelloFromChild
+🔥 Flow Explanation (Important for Exam)
+main.c → creates child using fork()
+
+Child → runs interpreter.sh using execl()
+
+interpreter.sh → calls echoall
+
+Arguments flow:
+
+From child → "HelloFromChild"
+
+From interpreter → "FromInterpreter"
+
+echoall.c prints all arguments
+
+🚀 Key Concepts to Mention
+fork() → creates child process
+
+execl() → replaces process image
+
+Interpreter script acts as middle layer
+
+Argument passing chain:
+
+parent → child → interpreter → program
+If you want, I can:
+
+Convert this into perfect 10-mark theory answer
+
+Add diagram (process tree + argument flow)
+
+Or give common viva questions professors ask from this exact problem
+
+
+a) Write a program to copy access and modification time of a file to
+another file using utime function.
+b) Write a C program using sigaction system call which calls a signal
+handler on SIGINT signal and then reset the default action of the
+SIGINT signal.
+
+Here are clean, exam-ready C programs for both parts with proper explanation.
+
+(a) Copy access & modification time using utime()
+✅ Concept
+stat() → get timestamps of source file
+
+utime() → set timestamps to destination file
+
+💻 Code
+#include <stdio.h>
+#include <sys/stat.h>
+#include <utime.h>
+
+int main() {
+    struct stat fileStat;
+    struct utimbuf new_times;
+
+    // Get time of source file
+    if (stat("source.txt", &fileStat) < 0) {
+        perror("stat error");
+        return 1;
+    }
+
+    // Assign access & modification time
+    new_times.actime = fileStat.st_atime;
+    new_times.modtime = fileStat.st_mtime;
+
+    // Apply to destination file
+    if (utime("destination.txt", &new_times) < 0) {
+        perror("utime error");
+        return 1;
+    }
+
+    printf("Timestamps copied successfully\n");
+    return 0;
+}
+▶️ Key Points
+st_atime → last access time
+
+st_mtime → last modification time
+
+utime() updates both
+
+(b) Handle SIGINT using sigaction and reset default
+✅ Concept
+First press Ctrl + C → custom handler executes
+
+Then reset signal to default
+
+Second press → program terminates normally
+
+💻 Code
+#include <stdio.h>
+#include <signal.h>
+#include <unistd.h>
+
+// Signal handler
+void handler(int signo) {
+    printf("\nSIGINT caught! Custom handler executed.\n");
+
+    // Reset SIGINT to default behavior
+    signal(SIGINT, SIG_DFL);
+}
+
+int main() {
+    struct sigaction sa;
+
+    sa.sa_handler = handler;
+    sigemptyset(&sa.sa_mask);
+    sa.sa_flags = 0;
+
+    // Register handler
+    sigaction(SIGINT, &sa, NULL);
+
+    while (1) {
+        printf("Running... Press Ctrl+C\n");
+        sleep(2);
+    }
+
+    return 0;
+}
+▶️ How it Works
+sigaction() registers custom handler
+
+First Ctrl+C → handler runs
+
+Inside handler → reset to default using signal(SIGINT, SIG_DFL)
+
+Second Ctrl+C → program terminates
+
+🔥 Exam Points (Very Important)
+utime() modifies file timestamps without changing content
+
+sigaction() is more reliable than signal()
+
+SIGINT is generated by Ctrl + C
+
+Resetting signal → demonstrates dynamic signal handling
+
+If you want, I can:
+
+Add diagram of signal flow (kernel → handler → reset)
+
+Or convert into perfect handwritten exam format (stepwise explanation)
+
+Or give viva questions (very commonly asked from sigaction)
+
+
+a) Write a program to read n characters from a file and append them
+back to the same file using dup2 function.
+b) Consider the last 100 bytes as a region. Write a C program to check
+whether the region is locked or not. If the region is locked, print pid
+of the process which has locked. If the region is not locked, lock
+the region with an exclusive lock, read the last 50 bytes and unlock
+the region.
+
+Here are precise, exam-ready C programs for both parts.
+
+(a) Read n characters and append back using dup2()
+✅ Concept
+Open file in read-write mode
+
+Read n bytes
+
+Move file pointer to end
+
+Use dup2() to duplicate file descriptor to STDOUT
+
+Write back (append)
+
+💻 Code
+#include <stdio.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <string.h>
+
+int main() {
+    int fd, n;
+    char buffer[100];
+
+    printf("Enter number of characters to read: ");
+    scanf("%d", &n);
+
+    fd = open("sample.txt", O_RDWR);
+    if (fd < 0) {
+        perror("open failed");
+        return 1;
+    }
+
+    // Read n characters
+    int bytes = read(fd, buffer, n);
+    if (bytes < 0) {
+        perror("read failed");
+        return 1;
+    }
+
+    // Move to end for appending
+    lseek(fd, 0, SEEK_END);
+
+    // Redirect stdout to file using dup2
+    dup2(fd, STDOUT_FILENO);
+
+    // Write buffer to file (append)
+    write(STDOUT_FILENO, buffer, bytes);
+
+    printf("\nData appended successfully\n");
+
+    close(fd);
+    return 0;
+}
+▶️ Key Points
+dup2(fd, STDOUT_FILENO) → redirects output to file
+
+Appending done by moving pointer to end
+
+Same file used for read + write
+
+(b) Check & lock last 100 bytes using fcntl()
+✅ Concept
+Use fcntl() with F_GETLK to check lock
+
+If unlocked → apply lock using F_SETLK
+
+Read last 50 bytes
+
+Unlock afterward
+
+💻 Code
+#include <stdio.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <sys/types.h>
+
+int main() {
+    int fd;
+    struct flock lock;
+    char buffer[51];
+
+    fd = open("sample.txt", O_RDWR);
+    if (fd < 0) {
+        perror("open failed");
+        return 1;
+    }
+
+    // Move to end to find size
+    off_t size = lseek(fd, 0, SEEK_END);
+
+    // Define last 100 bytes region
+    lock.l_type = F_WRLCK;
+    lock.l_whence = SEEK_SET;
+    lock.l_start = size - 100;
+    lock.l_len = 100;
+
+    // Check if locked
+    if (fcntl(fd, F_GETLK, &lock) == -1) {
+        perror("fcntl error");
+        return 1;
+    }
+
+    if (lock.l_type != F_UNLCK) {
+        printf("Region is locked by process with PID: %d\n", lock.l_pid);
+    } else {
+        printf("Region is not locked. Locking now...\n");
+
+        // Apply exclusive lock
+        lock.l_type = F_WRLCK;
+        fcntl(fd, F_SETLK, &lock);
+
+        // Read last 50 bytes
+        lseek(fd, size - 50, SEEK_SET);
+        read(fd, buffer, 50);
+        buffer[50] = '\0';
+
+        printf("Last 50 bytes:\n%s\n", buffer);
+
+        // Unlock region
+        lock.l_type = F_UNLCK;
+        fcntl(fd, F_SETLK, &lock);
+
+        printf("Region unlocked\n");
+    }
+
+    close(fd);
+    return 0;
+}
+▶️ Important Notes
+F_GETLK → checks lock status
+
+F_SETLK → sets/unsets lock
+
+F_WRLCK → exclusive (write) lock
+
+l_pid → gives process holding lock
+
+🔥 Exam-Level Takeaways
+dup2() → redirects file descriptors
+
+fcntl() → powerful file locking mechanism
+
+File locking is advisory in UNIX
+
+Always unlock after critical section
+
+If you want, I can:
+
+Add diagram for file descriptor redirection (dup2)
+
+Show blocking lock version (F_SETLKW)
+
+Or convert this into perfect 10-mark structured answer with headings
+
+
+a) Write a C program to illustrate the effect of setjmp and longjmp
+functions on register and volatile variables.
+b) C program to simulate copy command by accepting the filenames
+from the command line. Report all errors.
+
+Here are clear, exam-ready solutions for both parts.
+
+(a) Effect of setjmp() and longjmp() on register and volatile variables
+✅ Concept
+setjmp() saves execution context
+
+longjmp() restores it (non-local jump)
+
+After longjmp():
+
+volatile variables retain updated value
+
+register (non-volatile) variables may not (undefined behavior)
+
+💻 Code
+#include <stdio.h>
+#include <setjmp.h>
+
+jmp_buf env;
+
+int main() {
+    register int reg_var = 10;
+    volatile int vol_var = 20;
+
+    int val = setjmp(env);
+
+    if (val != 0) {
+        // After longjmp
+        printf("After longjmp:\n");
+        printf("register variable = %d\n", reg_var);
+        printf("volatile variable = %d\n", vol_var);
+        return 0;
+    }
+
+    // Modify variables
+    reg_var = 100;
+    vol_var = 200;
+
+    printf("Before longjmp:\n");
+    printf("register variable = %d\n", reg_var);
+    printf("volatile variable = %d\n", vol_var);
+
+    // Jump back
+    longjmp(env, 1);
+
+    return 0;
+}
+▶️ Expected Behavior
+Before longjmp:
+register variable = 100
+volatile variable = 200
+
+After longjmp:
+register variable = 10   (may revert / undefined)
+volatile variable = 200  (retained)
+🔥 Key Point (VERY IMPORTANT)
+Only volatile variables are guaranteed to retain values after longjmp().
+
+(b) Simulate cp command using command-line arguments
+✅ Concept
+Accept filenames from command line
+
+Open source (read mode)
+
+Open destination (write mode)
+
+Copy data
+
+Handle all errors
+
+💻 Code
+#include <stdio.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <stdlib.h>
+
+#define BUFFER_SIZE 1024
+
+int main(int argc, char *argv[]) {
+    int src, dest;
+    char buffer[BUFFER_SIZE];
+    ssize_t bytesRead, bytesWritten;
+
+    // Check arguments
+    if (argc != 3) {
+        fprintf(stderr, "Usage: %s <source> <destination>\n", argv[0]);
+        exit(1);
+    }
+
+    // Open source file
+    src = open(argv[1], O_RDONLY);
+    if (src < 0) {
+        perror("Error opening source file");
+        exit(1);
+    }
+
+    // Open destination file
+    dest = open(argv[2], O_WRONLY | O_CREAT | O_TRUNC, 0644);
+    if (dest < 0) {
+        perror("Error opening destination file");
+        close(src);
+        exit(1);
+    }
+
+    // Copy loop
+    while ((bytesRead = read(src, buffer, BUFFER_SIZE)) > 0) {
+        bytesWritten = write(dest, buffer, bytesRead);
+
+        if (bytesWritten != bytesRead) {
+            perror("Write error");
+            close(src);
+            close(dest);
+            exit(1);
+        }
+    }
+
+    if (bytesRead < 0) {
+        perror("Read error");
+    }
+
+    printf("File copied successfully\n");
+
+    close(src);
+    close(dest);
+
+    return 0;
+}
+▶️ Run Example
+gcc copy.c -o copy
+./copy file1.txt file2.txt
+🚀 Exam Takeaways
+(a)
+setjmp() + longjmp() → non-local jumps
+
+volatile safe, register not guaranteed
+
+(b)
+Command-line args → argc, argv
+
+File copy uses:
+
+open()
+
+read()
+
+write()
+
+error handling
+
+If you want, I can:
+
+Convert this into perfect handwritten 10-mark answer format
+
+Add flow diagram (copy command + setjmp execution)
+
+Give top viva questions professors ask from these topics
+
+
+a) Write a C program that takes the file name as an argument and prints
+the type of the given file.
+b) Write a C program to perform the following operations
+i. To create a child process
+ii. The child process should execute a program (using exec( )) to
+show the use of the access function
+iii. The parent process should wait for the child process to exit
+iv. Also print the necessary process IDs
+
+Here are clear, exam-ready programs for both parts.
+
+(a) Print the type of a file (given as argument)
+✅ Concept
+Use stat() to get file info
+
+Use macros like S_ISREG, S_ISDIR, etc. to identify type
+
+💻 Code
+#include <stdio.h>
+#include <sys/stat.h>
+
+int main(int argc, char *argv[]) {
+    struct stat fileStat;
+
+    if (argc != 2) {
+        printf("Usage: %s <filename>\n", argv[0]);
+        return 1;
+    }
+
+    if (stat(argv[1], &fileStat) < 0) {
+        perror("stat error");
+        return 1;
+    }
+
+    printf("File: %s\n", argv[1]);
+
+    if (S_ISREG(fileStat.st_mode))
+        printf("Type: Regular File\n");
+    else if (S_ISDIR(fileStat.st_mode))
+        printf("Type: Directory\n");
+    else if (S_ISCHR(fileStat.st_mode))
+        printf("Type: Character Device\n");
+    else if (S_ISBLK(fileStat.st_mode))
+        printf("Type: Block Device\n");
+    else if (S_ISFIFO(fileStat.st_mode))
+        printf("Type: FIFO (Pipe)\n");
+    else if (S_ISLNK(fileStat.st_mode))
+        printf("Type: Symbolic Link\n");
+    else if (S_ISSOCK(fileStat.st_mode))
+        printf("Type: Socket\n");
+    else
+        printf("Type: Unknown\n");
+
+    return 0;
+}
+▶️ Run
+gcc filetype.c -o filetype
+./filetype sample.txt
+(b) Process + exec() + access() demonstration
+We’ll use 2 programs:
+
+(i) Parent creates child and waits
+💻 parent.c
+#include <stdio.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+
+int main() {
+    pid_t pid = fork();
+
+    if (pid < 0) {
+        perror("Fork failed");
+        return 1;
+    }
+
+    if (pid == 0) {
+        // Child process
+        printf("Child Process\n");
+        printf("Child PID: %d, Parent PID: %d\n", getpid(), getppid());
+
+        // Execute access program
+        execl("./access_check", "access_check", "sample.txt", NULL);
+
+        perror("execl failed");
+    } 
+    else {
+        // Parent process
+        printf("Parent Process\n");
+        printf("Parent PID: %d, Child PID: %d\n", getpid(), pid);
+
+        wait(NULL);  // wait for child
+        printf("Child process finished\n");
+    }
+
+    return 0;
+}
+(ii) Program to demonstrate access()
+💻 access_check.c
+#include <stdio.h>
+#include <unistd.h>
+
+int main(int argc, char *argv[]) {
+
+    if (argc != 2) {
+        printf("Usage: %s <filename>\n", argv[0]);
+        return 1;
+    }
+
+    char *file = argv[1];
+
+    printf("\nChecking access permissions for: %s\n", file);
+
+    if (access(file, F_OK) == 0)
+        printf("File exists\n");
+    else
+        printf("File does not exist\n");
+
+    if (access(file, R_OK) == 0)
+        printf("Readable\n");
+    else
+        printf("Not readable\n");
+
+    if (access(file, W_OK) == 0)
+        printf("Writable\n");
+    else
+        printf("Not writable\n");
+
+    if (access(file, X_OK) == 0)
+        printf("Executable\n");
+    else
+        printf("Not executable\n");
+
+    return 0;
+}
+▶️ Compile & Run
+gcc access_check.c -o access_check
+gcc parent.c -o parent
+
+./parent
+▶️ Sample Output
+Parent Process
+Parent PID: 1234, Child PID: 1235
+
+Child Process
+Child PID: 1235, Parent PID: 1234
+
+Checking access permissions for: sample.txt
+File exists
+Readable
+Writable
+Not executable
+
+Child process finished
+🔥 Key Exam Points
+(a)
+stat() → fetch metadata
+
+File type macros:
+
+S_ISREG, S_ISDIR, etc.
+
+(b)
+fork() → creates child
+
+exec() → replaces process image
+
+access() → checks permissions
+
+wait() → parent synchronization
+
+Process IDs:
+
+getpid() → current process
+
+getppid() → parent process
+
+If you want, I can:
+
+Combine (b) into single-file version (professors love that sometimes)
+
+Add process tree diagram + execution flow
+
+Give top viva questions from fork/exec/access (very important)
+
+
+a) Write a C program to demonstrate the usage of umask and chmod
+functions.
+b) Write a C program
+i. To read the first 20 characters from a file
+ii. seek to 10th byte from the beginning and display 20 characters
+from there
+iii. seek 10 bytes ahead from the current file offset and display 20
+characters
+iv. Display the file size
+
+Here are clean, exam-ready programs for both parts.
+
+(a) Demonstrate umask and chmod
+✅ Concept
+umask() → sets default permission mask for new files
+
+chmod() → changes permissions of existing file
+
+💻 Code
+#include <stdio.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
+
+int main() {
+    int fd;
+
+    // Set umask (mask out write permission for group & others)
+    umask(0022);
+
+    // Create file with full permissions (will be masked by umask)
+    fd = open("testfile.txt", O_CREAT | O_WRONLY, 0777);
+    if (fd < 0) {
+        perror("open failed");
+        return 1;
+    }
+
+    close(fd);
+
+    printf("File created with umask applied.\n");
+
+    // Change permissions using chmod
+    if (chmod("testfile.txt", 0644) == 0)
+        printf("Permissions changed using chmod.\n");
+    else
+        perror("chmod failed");
+
+    return 0;
+}
+▶️ Explanation
+Requested permission: 0777
+
+umask(0022) → final = 0755
+
+Then chmod() → sets to 0644
+
+(b) File operations using lseek()
+✅ Concept
+read() → read file
+
+lseek() → move file pointer
+
+SEEK_SET, SEEK_CUR used
+
+File size via lseek(fd, 0, SEEK_END)
+
+💻 Code
+#include <stdio.h>
+#include <fcntl.h>
+#include <unistd.h>
+
+int main() {
+    int fd;
+    char buffer[21];
+    off_t size;
+
+    fd = open("sample.txt", O_RDONLY);
+    if (fd < 0) {
+        perror("open failed");
+        return 1;
+    }
+
+    // i. Read first 20 characters
+    read(fd, buffer, 20);
+    buffer[20] = '\0';
+    printf("First 20 characters:\n%s\n\n", buffer);
+
+    // ii. Seek to 10th byte from beginning
+    lseek(fd, 10, SEEK_SET);
+    read(fd, buffer, 20);
+    buffer[20] = '\0';
+    printf("From 10th byte (20 chars):\n%s\n\n", buffer);
+
+    // iii. Seek 10 bytes ahead from current position
+    lseek(fd, 10, SEEK_CUR);
+    read(fd, buffer, 20);
+    buffer[20] = '\0';
+    printf("After seeking 10 bytes ahead (20 chars):\n%s\n\n", buffer);
+
+    // iv. Display file size
+    size = lseek(fd, 0, SEEK_END);
+    printf("File size: %ld bytes\n", size);
+
+    close(fd);
+    return 0;
+}
+▶️ Key Points
+SEEK_SET → from beginning
+
+SEEK_CUR → from current position
+
+SEEK_END → for file size
+
+Always null-terminate buffer for printing
+
+🔥 Exam Takeaways
+(a)
+umask controls default permissions
+
+chmod modifies permissions explicitly
+
+(b)
+lseek() enables random file access
+
+File size can be obtained without stat()
+
+File pointer movement is crucial concept
+
+If you want, I can:
+
+Add permission calculation table (umask vs actual)
+
+Show real ls -l output interpretation
+
+Or convert into perfect 10-mark structured answer format
+
+
+a) Write a C program such that it initializes itself as a Daemon Process.
+b) Demonstrate the working of wait and waitpid system calls with a
+program
+
+Here are clean, exam-ready programs with proper structure and explanation.
+
+(a) Program to initialize as a Daemon Process
+✅ Concept
+A daemon is a background process that:
+
+Runs independently of terminal
+
+Has no controlling terminal
+
+Runs in background continuously
+
+🔑 Steps to create a daemon
+fork() and let parent exit
+
+setsid() → create new session
+
+Change working directory
+
+Reset file permissions (umask)
+
+Close standard file descriptors
+
+💻 Code
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+
+int main() {
+    pid_t pid;
+
+    // Step 1: Fork
+    pid = fork();
+    if (pid < 0) {
+        exit(1);
+    }
+    if (pid > 0) {
+        // Parent exits
+        exit(0);
+    }
+
+    // Step 2: Create new session
+    if (setsid() < 0) {
+        exit(1);
+    }
+
+    // Step 3: Set file permissions
+    umask(0);
+
+    // Step 4: Change working directory
+    chdir("/");
+
+    // Step 5: Close standard file descriptors
+    close(STDIN_FILENO);
+    close(STDOUT_FILENO);
+    close(STDERR_FILENO);
+
+    // Example daemon work loop
+    while (1) {
+        // You can write logs to a file here
+        sleep(5);
+    }
+
+    return 0;
+}
+▶️ Key Points
+Runs in background (check using ps)
+
+No terminal interaction
+
+Used for services like cron, servers
+
+(b) Demonstrate wait() and waitpid()
+✅ Concept
+wait() → waits for any child
+
+waitpid() → waits for specific child
+
+💻 Code
+#include <stdio.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+
+int main() {
+    pid_t pid1, pid2;
+    int status;
+
+    // First child
+    pid1 = fork();
+    if (pid1 == 0) {
+        printf("Child 1: PID = %d\n", getpid());
+        sleep(2);
+        printf("Child 1 exiting\n");
+        return 1;
+    }
+
+    // Second child
+    pid2 = fork();
+    if (pid2 == 0) {
+        printf("Child 2: PID = %d\n", getpid());
+        sleep(4);
+        printf("Child 2 exiting\n");
+        return 2;
+    }
+
+    // Parent process
+    printf("Parent PID: %d\n", getpid());
+
+    // wait() → waits for any child
+    wait(&status);
+    printf("Parent: One child finished (wait)\n");
+
+    // waitpid() → wait for specific child (pid2)
+    waitpid(pid2, &status, 0);
+    printf("Parent: Child 2 finished (waitpid)\n");
+
+    return 0;
+}
+▶️ Example Output
+Parent PID: 2000
+Child 1: PID = 2001
+Child 2: PID = 2002
+
+Child 1 exiting
+Parent: One child finished (wait)
+
+Child 2 exiting
+Parent: Child 2 finished (waitpid)
+🔥 Key Exam Points
+Daemon
+Background process
+
+No terminal
+
+Uses setsid()
+
+wait vs waitpid
+Feature	wait()	waitpid()
+Waits for	Any child	Specific child
+Control	Less	More
+Usage	Simple	Flexible
+🚀 Final Takeaway
+Daemon = background service
+
+wait() = general synchronization
+
+waitpid() = precise process control
+
+If you want, I can:
+
+Add daemon flow diagram (fork → setsid → detach)
+
+Show real logging daemon example (write to file)
+
+Give top viva questions (very frequently asked from daemon & wait)
+
+
+a) Write a program to differentiate between dup and dup2 functions 
+b) Write a program to perform the following operations
+i) To create a child process
+ii) The child process should execute a separate program (using exec
+function) that calculates the addition of two numbers by passing two
+integer values.
+iii) The parent process should wait for a child to complete
+
+Here are clean, exam-ready solutions for both parts.
+
+(a) Differentiate between dup() and dup2() (with program)
+✅ Concept
+dup(oldfd) → duplicates to lowest available fd
+
+dup2(oldfd, newfd) → duplicates to specified fd
+
+💻 Code
+#include <stdio.h>
+#include <fcntl.h>
+#include <unistd.h>
+
+int main() {
+    int fd, fd_dup, fd_dup2;
+
+    fd = open("sample.txt", O_WRONLY | O_CREAT | O_TRUNC, 0644);
+    if (fd < 0) {
+        perror("open failed");
+        return 1;
+    }
+
+    // Write using original fd
+    write(fd, "Original FD\n", 12);
+
+    // dup() → gets next available fd
+    fd_dup = dup(fd);
+    write(fd_dup, "Written using dup()\n", 20);
+
+    // dup2() → force to specific fd (e.g., 5)
+    fd_dup2 = dup2(fd, 5);
+    write(fd_dup2, "Written using dup2()\n", 21);
+
+    printf("Original FD: %d\n", fd);
+    printf("dup FD: %d\n", fd_dup);
+    printf("dup2 FD: %d\n", fd_dup2);
+
+    close(fd);
+    close(fd_dup);
+    close(fd_dup2);
+
+    return 0;
+}
+▶️ Key Differences (Exam Point)
+Feature	dup()	dup2()
+FD choice	Automatic	User-defined
+Overwrites fd	No	Yes (if exists)
+Control	Less	More
+(b) Parent–Child + exec() + Addition Program
+We’ll use 2 programs:
+
+(i) Parent program (creates child & waits)
+💻 parent.c
+#include <stdio.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+
+int main() {
+    pid_t pid = fork();
+
+    if (pid < 0) {
+        perror("fork failed");
+        return 1;
+    }
+
+    if (pid == 0) {
+        // Child process
+        printf("Child Process (PID: %d)\n", getpid());
+
+        // Execute add program
+        execl("./add", "add", "10", "20", NULL);
+
+        perror("execl failed");
+    } else {
+        // Parent process
+        printf("Parent Process (PID: %d)\n", getpid());
+
+        wait(NULL);  // wait for child
+        printf("Child process completed\n");
+    }
+
+    return 0;
+}
+(ii) Addition program (executed by child)
+💻 add.c
+#include <stdio.h>
+#include <stdlib.h>
+
+int main(int argc, char *argv[]) {
+
+    if (argc != 3) {
+        printf("Usage: %s <num1> <num2>\n", argv[0]);
+        return 1;
+    }
+
+    int a = atoi(argv[1]);
+    int b = atoi(argv[2]);
+
+    printf("Addition: %d + %d = %d\n", a, b, a + b);
+
+    return 0;
+}
+▶️ Compile & Run
+gcc add.c -o add
+gcc parent.c -o parent
+
+./parent
+▶️ Sample Output
+Parent Process (PID: 3000)
+Child Process (PID: 3001)
+Addition: 10 + 20 = 30
+Child process completed
+🔥 Key Exam Points
+(a)
+dup() → next free descriptor
+
+dup2() → specific descriptor control
+
+Both share same file offset
+
+(b)
+fork() → create child
+
+exec() → replace child process
+
+wait() → synchronization
+
+Argument passing via argv[]
+
+🚀 Final Takeaway
+dup/dup2 → file descriptor manipulation
+
+fork + exec + wait → core process control in UNIX
+
+If you want, I can:
+
+Show diagram (FD table before/after dup & dup2)
+
+Convert this into perfect 10-mark theory + code answer
+
+Give top viva questions (very commonly asked from dup/exec)
+
+
+a) Write a program to demonstrate the zombie state of a process and
+provide the solution for the same.
+b) Write a C program to perform the following operations
+i) To create a child and parent process with the use of an echoall
+file.
+ii) The Child should execute a process that prints the user defined
+values of environment variables
+iii) The Parent should execute a process that prints default values
+for the environment variables.
+
+Here are clean, exam-ready solutions for both parts with clear demonstration and explanation.
+
+(a) Zombie Process Demonstration + Solution
+✅ Concept
+A zombie process is a child that has finished execution but
+parent has not read its exit status using wait()
+
+It remains in process table as defunct
+
+💻 Program to create Zombie
+#include <stdio.h>
+#include <unistd.h>
+#include <sys/types.h>
+
+int main() {
+    pid_t pid = fork();
+
+    if (pid > 0) {
+        // Parent process
+        printf("Parent PID: %d\n", getpid());
+        printf("Child PID: %d\n", pid);
+
+        sleep(10);  // Delay so child becomes zombie
+    } 
+    else if (pid == 0) {
+        // Child process
+        printf("Child process exiting...\n");
+    }
+
+    return 0;
+}
+▶️ How to Observe
+Run in terminal:
+
+ps -l
+You will see child in Z (Zombie) state.
+
+💻 Solution (Prevent Zombie)
+#include <stdio.h>
+#include <unistd.h>
+#include <sys/wait.h>
+
+int main() {
+    pid_t pid = fork();
+
+    if (pid > 0) {
+        wait(NULL);  // Collect child status
+        printf("Child terminated, no zombie\n");
+    } 
+    else if (pid == 0) {
+        printf("Child exiting...\n");
+    }
+
+    return 0;
+}
+🔥 Key Point
+Zombie exists because parent didn’t call wait() or waitpid().
+
+(b) Parent–Child with Environment Variables using echoall
+We’ll use 2 programs:
+
+(i) echoall.c (prints arguments + environment variables)
+#include <stdio.h>
+
+extern char **environ;
+
+int main(int argc, char *argv[]) {
+
+    printf("\n--- Arguments ---\n");
+    for (int i = 0; i < argc; i++) {
+        printf("argv[%d] = %s\n", i, argv[i]);
+    }
+
+    printf("\n--- Environment Variables ---\n");
+    for (int i = 0; environ[i] != NULL; i++) {
+        printf("%s\n", environ[i]);
+    }
+
+    return 0;
+}
+(ii) Parent + Child program
+#include <stdio.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+
+int main() {
+    pid_t pid = fork();
+
+    if (pid < 0) {
+        perror("fork failed");
+        return 1;
+    }
+
+    if (pid == 0) {
+        // Child process
+        printf("\nChild Process (PID: %d)\n", getpid());
+
+        // Custom environment variables
+        char *envp[] = {
+            "USER=CustomUser",
+            "PATH=/custom/bin",
+            "HOME=/custom/home",
+            NULL
+        };
+
+        execle("./echoall", "echoall", "ChildArg1", NULL, envp);
+        perror("execle failed");
+    } 
+    else {
+        // Parent process
+        printf("\nParent Process (PID: %d)\n", getpid());
+
+        wait(NULL);
+
+        // Parent uses default environment
+        execl("./echoall", "echoall", "ParentArg1", NULL);
+
+        perror("execl failed");
+    }
+
+    return 0;
+}
+▶️ Compile & Run
+gcc echoall.c -o echoall
+gcc main.c -o main
+
+./main
+▶️ Output Behavior
+Child Output:
+Prints custom environment variables
+
+USER=CustomUser
+PATH=/custom/bin
+HOME=/custom/home
+Parent Output:
+Prints default system environment variables
+
+🔥 Key Exam Points
+Zombie
+Dead child + no wait()
+
+Fix: wait() / waitpid()
+
+Environment Variables
+execle() → pass custom environment
+
+execl() → uses default environment
+
+environ → access env variables
+
+🚀 Final Takeaway
+Zombie = resource leak → must handle
+
+exec family enables:
+
+argument passing
+
+environment control
+
+If you want, I can:
+
+Add process state diagram (Running → Zombie)
+
+Show orphan process vs zombie (very common viva question)
+
+Convert into perfect 10-mark answer format with headings + diagrams
+
+
+a) Write a program to demonstrate the zombie state of a process and
+provide the solution for the same.
+b) Write a C program to perform the following operations
+i) To create a child and parent process with the use of an echoall
+file.
+ii) The Child should execute a process that prints the user defined
+values of environment variables
+iii) The Parent should execute a process that prints default values
+for the environment variables.
+
+Here’s a clean, exam-ready answer for both parts with proper structure and clarity.
+
+(a) Zombie Process Demonstration & Solution
+✅ Concept
+A zombie process is a child process that has terminated
+but its parent has not collected its exit status using wait().
+
+It remains in process table as Z (defunct).
+
+💻 Program to Create Zombie
+#include <stdio.h>
+#include <unistd.h>
+#include <sys/types.h>
+
+int main() {
+    pid_t pid = fork();
+
+    if (pid > 0) {
+        // Parent process
+        printf("Parent PID: %d\n", getpid());
+        printf("Child PID: %d\n", pid);
+
+        sleep(10); // Delay → child becomes zombie
+    } 
+    else if (pid == 0) {
+        // Child process
+        printf("Child exiting...\n");
+    }
+
+    return 0;
+}
+▶️ Observation
+Run:
+
+ps -l
+You’ll see the child process in Z (Zombie) state.
+
+💻 Solution (Prevent Zombie)
+#include <stdio.h>
+#include <unistd.h>
+#include <sys/wait.h>
+
+int main() {
+    pid_t pid = fork();
+
+    if (pid > 0) {
+        wait(NULL);  // Parent collects child status
+        printf("No zombie process\n");
+    } 
+    else if (pid == 0) {
+        printf("Child exiting...\n");
+    }
+
+    return 0;
+}
+🔥 Key Point
+Zombie occurs when parent does NOT call wait() or waitpid().
+
+(b) Parent–Child using echoall & Environment Variables
+We will use 2 files:
+
+(i) echoall.c (Print arguments + environment variables)
+#include <stdio.h>
+
+extern char **environ;
+
+int main(int argc, char *argv[]) {
+
+    printf("\n--- Arguments ---\n");
+    for (int i = 0; i < argc; i++) {
+        printf("argv[%d] = %s\n", i, argv[i]);
+    }
+
+    printf("\n--- Environment Variables ---\n");
+    for (int i = 0; environ[i] != NULL; i++) {
+        printf("%s\n", environ[i]);
+    }
+
+    return 0;
+}
+(ii) Parent & Child Program
+#include <stdio.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+
+int main() {
+    pid_t pid = fork();
+
+    if (pid < 0) {
+        perror("fork failed");
+        return 1;
+    }
+
+    if (pid == 0) {
+        // Child process
+        printf("\nChild Process (PID: %d)\n", getpid());
+
+        // User-defined environment variables
+        char *envp[] = {
+            "USER=CustomUser",
+            "HOME=/custom/home",
+            "PATH=/custom/bin",
+            NULL
+        };
+
+        execle("./echoall", "echoall", "ChildArg", NULL, envp);
+        perror("execle failed");
+    } 
+    else {
+        // Parent process
+        printf("\nParent Process (PID: %d)\n", getpid());
+
+        wait(NULL);  // wait for child
+
+        // Parent uses default environment
+        execl("./echoall", "echoall", "ParentArg", NULL);
+
+        perror("execl failed");
+    }
+
+    return 0;
+}
+▶️ Compile & Run
+gcc echoall.c -o echoall
+gcc main.c -o main
+
+./main
+▶️ Expected Behavior
+Child Process:
+Prints custom environment variables
+
+USER=CustomUser
+HOME=/custom/home
+PATH=/custom/bin
+Parent Process:
+Prints default system environment variables
+
+🔥 Key Exam Points
+Zombie
+Dead child + parent didn’t call wait()
+
+Fix: wait() / waitpid()
+
+Environment Variables
+execle() → pass custom environment
+
+execl() → uses default environment
+
+environ → access environment variables
+
+🚀 Final Takeaway
+Zombie = improper process cleanup
+
+exec family allows:
+
+argument passing
+
+environment customization
+
+If you want, I can also:
+
+Add diagram (process lifecycle + zombie state)
+
+Explain orphan vs zombie (very common viva question)
+
+Convert into perfect 10-mark handwritten format
+
+

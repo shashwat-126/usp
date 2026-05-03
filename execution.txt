@@ -1,0 +1,293 @@
+Q1A
+shashwat@shashwat:~/Downloads/usp$ vi sample.txt
+shashwat@shashwat:~/Downloads/usp$ gcc 1a.c
+shashwat@shashwat:~/Downloads/usp$ ./a.out 
+
+ gninroM dooG tawhsahS olleH
+
+Q1B 
+shashwat@shashwat:~/Downloads/usp$ gcc 1b.c
+shashwat@shashwat:~/Downloads/usp$ ./a.out 
+Parent read: Hello
+Child read:  Shas
+
+Q2A
+shashwat@shashwat:~/Downloads/usp$ gcc 2a.c
+shashwat@shashwat:~/Downloads/usp$ ./a.out 
+File Size: 29 bytes
+Number of Links: 1
+File inode: 13764581
+File Permissions: 100664
+User ID of owner: 1000
+Last Access Time: Sun May  3 07:05:49 2026
+Last Modification Time: Sun May  3 07:05:49 2026
+
+Q2B
+shashwat@shashwat:~/Downloads/usp$ gcc 2b.c
+shashwat@shashwat:~/Downloads/usp$ ./a.out 
+total 36
+-rw-rw-r-- 1 shashwat shashwat   516 May  3 07:02 1a.c
+-rw-rw-r-- 1 shashwat shashwat   778 May  3 07:06 1b.c
+-rw-rw-r-- 1 shashwat shashwat   645 May  3 07:07 2a.c
+-rw-rw-r-- 1 shashwat shashwat   516 May  3 07:07 2b.c
+-rwxrwxr-x 1 shashwat shashwat 16160 May  3 07:08 a.out
+-rw-rw-r-- 1 shashwat shashwat    29 May  3 07:05 sample.txt
+
+Q3A
+shashwat@shashwat:~/Downloads/usp$ vi emplty.txt
+shashwat@shashwat:~/Downloads/usp$ gcc 3a.c
+shashwat@shashwat:~/Downloads/usp$ ./a.out .
+Removed empty file: emplty.txt
+
+Q3B
+shashwat@shashwat:~/Downloads/usp$ gcc 3b.c
+shashwat@shashwat:~/Downloads/usp$ ./a.out .
+Inode: 13764581
+File Name: sample.txt
+Size: 29 bytes
+Links: 1
+Owner UID: 1000
+Last Modified: Sun May  3 07:05:49 2026
+---------------------------
+Inode: 13373224
+File Name: 3a.c
+Size: 925 bytes
+Links: 1
+Owner UID: 1000
+Last Modified: Sun May  3 07:08:30 2026
+---------------------------
+Inode: 13373047
+File Name: 3b.c
+Size: 881 bytes
+Links: 1
+Owner UID: 1000
+Last Modified: Sun May  3 07:10:05 2026
+---------------------------
+Inode: 13373211
+File Name: 2b.c
+Size: 516 bytes
+Links: 1
+Owner UID: 1000
+Last Modified: Sun May  3 07:07:53 2026
+---------------------------
+Inode: 13373086
+File Name: 1a.c
+Size: 516 bytes
+Links: 1
+Owner UID: 1000
+Last Modified: Sun May  3 07:02:16 2026
+---------------------------
+Inode: 13764744
+File Name: .
+Size: 4096 bytes
+Links: 2
+Owner UID: 1000
+Last Modified: Sun May  3 07:10:26 2026
+---------------------------
+Inode: 13373220
+File Name: 1b.c
+Size: 778 bytes
+Links: 1
+Owner UID: 1000
+Last Modified: Sun May  3 07:06:41 2026
+---------------------------
+Inode: 13764466
+File Name: a.out
+Size: 16304 bytes
+Links: 1
+Owner UID: 1000
+Last Modified: Sun May  3 07:10:26 2026
+---------------------------
+Inode: 13369478
+File Name: ..
+Size: 4096 bytes
+Links: 3
+Owner UID: 1000
+Last Modified: Sun May  3 07:10:09 2026
+---------------------------
+Inode: 13369415
+File Name: 2a.c
+Size: 645 bytes
+Links: 1
+Owner UID: 1000
+Last Modified: Sun May  3 07:07:26 2026
+---------------------------
+
+Q4A
+shashwat@shashwat:~/Downloads/usp$ gcc 4a.c
+shashwat@shashwat:~/Downloads/usp$ vi original.txt
+shashwat@shashwat:~/Downloads/usp$ gcc 4a.c
+shashwat@shashwat:~/Downloads/usp$ ./a.out 
+Hard link created successfully
+Soft link created successfully
+
+Q4B
+shashwat@shashwat:~/Downloads/usp$ mkdir 4
+shashwat@shashwat:~/Downloads/usp$ cd 4
+shashwat@shashwat:~/Downloads/usp/4$ chmod +x interpreter.sh
+shashwat@shashwat:~/Downloads/usp/4$ sed -i 's/\r$//' interpreter.sh   # i need to change on github
+shashwat@shashwat:~/Downloads/usp/4$ gcc echoall.c -o echoall
+gcc main.c -o main
+
+./main
+Total arguments received: 3
+Argument 0: ./echoall
+Argument 1: FromInterpreter
+Argument 2: HelloFromChild
+shashwat@shashwat:~/Downloads/usp/4$ cd ..
+
+Q5A
+shashwat@shashwat:~/Downloads/usp$ vi source.txt
+shashwat@shashwat:~/Downloads/usp$ vi destination.txt
+shashwat@shashwat:~/Downloads/usp$ gcc 5a.c
+shashwat@shashwat:~/Downloads/usp$ ./a.out
+Timestamps copied successfully
+
+Q5B
+shashwat@shashwat:~/Downloads/usp$ gcc 5b.c
+shashwat@shashwat:~/Downloads/usp$ ./a.out
+Running... Press Ctrl+C
+^C
+SIGINT caught! Custom handler executed.
+Running... Press Ctrl+C
+^C
+
+Q6A
+shashwat@shashwat:~/Downloads/usp$ gcc 6a.c  
+shashwat@shashwat:~/Downloads/usp$ ./a.out
+Enter number of characters to read: 4  # AFTER THIS OPEN WHATEVER FILENAME IN CODE
+
+Q6B
+shashwat@shashwat:~/Downloads/usp$ gcc 6b.c  i nedd to update this one
+shashwat@shashwat:~/Downloads/usp$ ./a.out
+Region is not locked. Locking now...
+Last 50 bytes:
+wat Good Morning 
+Hell
+Data appended successfully
+
+Region unlocked
+
+Q7A
+shashwat@shashwat:~/Downloads/usp$ gcc 7a.c
+shashwat@shashwat:~/Downloads/usp$ ./a.out
+Before longjmp:
+register variable = 100
+volatile variable = 200
+After longjmp:
+register variable = 10
+volatile variable = 200
+
+Q7B
+shashwat@shashwat:~/Downloads/usp$ gcc 7b.c # CREATE SOURCE AND DESTINATION FILE 
+shashwat@shashwat:~/Downloads/usp$ ./a.out source.txt destination.txt
+File copied successfully
+
+Q8A
+shashwat@shashwat:~/Downloads/usp$ gcc 8a.c
+shashwat@shashwat:~/Downloads/usp$ ./a.out source.txt 
+File: source.txt
+Type: Regular File
+
+Q8B
+shashwat@shashwat:~/Downloads/usp$ mkdir 8
+shashwat@shashwat:~/Downloads/usp$ cd 8
+Child process finished
+shashwat@shashwat:~/Downloads/usp/8$ vi sample.txt
+shashwat@shashwat:~/Downloads/usp/8$ gcc access_check.c -o access_check
+gcc parent.c -o parent
+shashwat@shashwat:~/Downloads/usp/8$ ./parent sample.txt
+Parent Process
+Parent PID: 15172, Child PID: 15173
+Child Process
+Child PID: 15173, Parent PID: 15172
+
+Checking access permissions for: sample.txt
+File exists
+Readable
+Writable
+Not executable
+Child process finished
+shashwat@shashwat:~/Downloads/usp/8$ cd ..
+
+Q9A
+shashwat@shashwat:~/Downloads/usp$ vi testfile.txt
+shashwat@shashwat:~/Downloads/usp$ gcc 9a.c
+shashwat@shashwat:~/Downloads/usp$ ./a.out
+File created with umask applied.
+Permissions changed using chmod.
+
+Q9B
+shashwat@shashwat:~/Downloads/usp$ gcc 9b.c
+shashwat@shashwat:~/Downloads/usp$ ./a.out
+First 20 characters:
+Hello Shashwat Good 
+
+From 10th byte (20 chars):
+hwat Good Morning 
+H
+
+After seeking 10 bytes ahead (20 chars):
+ppended successfully
+
+File size: 61 bytes
+
+Q10A
+shashwat@shashwat:~/Downloads/usp$ gcc 10a.c
+shashwat@shashwat:~/Downloads/usp$ ./a.out
+shashwat@shashwat:~/Downloads/usp$ ps
+    PID TTY          TIME CMD
+   8934 pts/0    00:00:00 bash
+  15488 pts/0    00:00:00 ps
+  
+ Q10B
+shashwat@shashwat:~/Downloads/usp$ gcc 10b.c
+shashwat@shashwat:~/Downloads/usp$ ./a.out
+Parent PID: 15512
+Child 1: PID = 15513
+Child 2: PID = 15514
+Child 1 exiting
+Parent: One child finished (wait)
+Child 2 exiting
+Parent: Child 2 finished (waitpid)
+
+Q11A
+shashwat@shashwat:~/Downloads/usp$ gcc 11a.c
+shashwat@shashwat:~/Downloads/usp$ ./a.out
+Original FD: 3
+dup FD: 4
+dup2 FD: 5
+
+Q11B
+shashwat@shashwat:~/Downloads/usp$ mkdir 11
+shashwat@shashwat:~/Downloads/usp$ cd 11
+shashwat@shashwat:~/Downloads/usp/11$ gcc add.c -o add
+gcc parent.c -o parent
+
+./parent
+Parent Process (PID: 15871)
+Child Process (PID: 15872)
+Addition: 10 + 20 = 30
+Child process completed
+shashwat@shashwat:~/Downloads/usp/11$ cd ..
+
+Q12A
+shashwat@shashwat:~/Downloads/usp$ gcc 12a.c
+shashwat@shashwat:~/Downloads/usp$ ./a.out
+Parent PID: 15974
+Child PID: 15975
+Child process exiting...
+shashwat@shashwat:~/Downloads/usp$ ps -l
+F S   UID     PID    PPID  C PRI  NI ADDR SZ WCHAN  TTY          TIME CMD
+0 S  1000    8934    8913  0  80   0 -  5027 do_wai pts/0    00:00:00 bash
+4 R  1000   15987    8934  0  80   0 -  5372 -      pts/0    00:00:00 ps
+
+Q12B
+shashwat@shashwat:~/Downloads/usp$ mkdir 12
+shashwat@shashwat:~/Downloads/usp$ cd 12
+shashwat@shashwat:~/Downloads/usp/12$ gcc echoall.c -o echoall
+gcc main.c -o main
+
+./main
+
+
