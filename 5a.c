@@ -1,0 +1,27 @@
+#include <stdio.h>
+#include <sys/stat.h>
+#include <utime.h>
+
+int main() {
+    struct stat fileStat;
+    struct utimbuf new_times;
+
+    // Get time of source file
+    if (stat("source.txt", &fileStat) < 0) {
+        perror("stat error");
+        return 1;
+    }
+
+    // Assign access & modification time
+    new_times.actime = fileStat.st_atime;
+    new_times.modtime = fileStat.st_mtime;
+
+    // Apply to destination file
+    if (utime("destination.txt", &new_times) < 0) {
+        perror("utime error");
+        return 1;
+    }
+
+    printf("Timestamps copied successfully\n");
+    return 0;
+}

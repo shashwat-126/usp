@@ -1,0 +1,29 @@
+#include <stdio.h>
+#include <unistd.h>
+#include <sys/wait.h>
+
+int mysystem(const char *command) {
+    pid_t pid;
+    int status;
+
+    pid = fork();
+
+    if (pid < 0) {
+        return -1; // error
+    }
+
+    if (pid == 0) {
+        // Child process executes shell command
+        execl("/bin/sh", "sh", "-c", command, (char *)NULL);
+        _exit(127); // if exec fails
+    }
+
+    // Parent waits
+    wait(&status);
+    return status;
+}
+
+int main() {
+    mysystem("ls -l");
+    return 0;
+}

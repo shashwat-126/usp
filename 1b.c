@@ -1,0 +1,42 @@
+#include <stdio.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <sys/types.h>
+
+int main() {
+    int fd;
+    char buffer[10];
+
+    fd = open("sample.txt", O_RDONLY);
+    if (fd < 0) {
+        perror("Error opening file");
+        return 1;
+    }
+
+    pid_t pid = fork();
+
+    if (pid < 0) {
+        perror("Fork failed");
+        return 1;
+    }
+
+    // Parent process
+    if (pid > 0) {
+        read(fd, buffer, 5);
+        buffer[5] = '\0';
+        printf("Parent read: %s\n", buffer);
+
+        sleep(1); // ensure order
+    }
+    // Child process
+    else {
+        sleep(1); // wait for parent
+
+        read(fd, buffer, 5);
+        buffer[5] = '\0';
+        printf("Child read: %s\n", buffer);
+    }
+
+    close(fd);
+    return 0;
+}

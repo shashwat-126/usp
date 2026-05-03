@@ -1,0 +1,27 @@
+#include <stdio.h>
+#include <fcntl.h>
+#include <unistd.h>
+
+int main() {
+    int fd;
+    char ch;
+
+    fd = open("sample.txt", O_RDONLY);
+    if (fd < 0) {
+        perror("Error opening file");
+        return 1;
+    }
+
+    // Move to end of file
+    off_t size = lseek(fd, 0, SEEK_END);
+
+    // Traverse backwards
+    for (off_t i = size - 1; i >= 0; i--) {
+        lseek(fd, i, SEEK_SET);
+        read(fd, &ch, 1);
+        write(STDOUT_FILENO, &ch, 1);
+    }
+
+    close(fd);
+    return 0;
+}

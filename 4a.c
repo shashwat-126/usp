@@ -1,0 +1,24 @@
+#include <stdio.h>
+#include <unistd.h>
+
+int main() {
+
+    // Create a file first (manually or using system)
+    FILE *fp = fopen("original.txt", "w");
+    fprintf(fp, "Hello Links\n");
+    fclose(fp);
+
+    // Create hard link
+    if (link("original.txt", "hardlink.txt") == 0)
+        printf("Hard link created successfully\n");
+    else
+        perror("Hard link failed");
+
+    // Create soft link
+    if (symlink("original.txt", "softlink.txt") == 0)
+        printf("Soft link created successfully\n");
+    else
+        perror("Soft link failed");
+
+    return 0;
+}

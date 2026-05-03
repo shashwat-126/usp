@@ -1,0 +1,23 @@
+#include <stdio.h>
+#include <unistd.h>
+#include <sys/types.h>
+
+int main() {
+    pid_t pid = fork();
+
+    if (pid > 0) {
+        // Parent process
+        printf("Parent PID: %d\n", getpid());
+        printf("Child PID: %d\n", pid);
+
+        sleep(10);  // Delay so child becomes zombie
+    } 
+    else if (pid == 0) {
+        // Child process
+        printf("Child process exiting...\n");
+    }
+
+    return 0;
+}
+
+//ps -l checl zombie

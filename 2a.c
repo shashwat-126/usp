@@ -1,0 +1,23 @@
+#include <stdio.h>
+#include <sys/stat.h>
+#include <time.h>
+
+int main() {
+    struct stat fileStat;
+
+    if (stat("sample.txt", &fileStat) < 0) {
+        perror("stat error");
+        return 1;
+    }
+
+    printf("File Size: %ld bytes\n", fileStat.st_size);
+    printf("Number of Links: %ld\n", fileStat.st_nlink);
+    printf("File inode: %ld\n", fileStat.st_ino);
+    printf("File Permissions: %o\n", fileStat.st_mode);
+    printf("User ID of owner: %d\n", fileStat.st_uid);
+
+    printf("Last Access Time: %s", ctime(&fileStat.st_atime));
+    printf("Last Modification Time: %s", ctime(&fileStat.st_mtime));
+
+    return 0;
+}

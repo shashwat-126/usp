@@ -1,0 +1,39 @@
+#include <stdio.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <string.h>
+
+int main() {
+    int fd, n;
+    char buffer[100];
+
+    printf("Enter number of characters to read: ");
+    scanf("%d", &n);
+
+    fd = open("sample.txt", O_RDWR);
+    if (fd < 0) {
+        perror("open failed");
+        return 1;
+    }
+
+    // Read n characters
+    int bytes = read(fd, buffer, n);
+    if (bytes < 0) {
+        perror("read failed");
+        return 1;
+    }
+
+    // Move to end for appending
+    lseek(fd, 0, SEEK_END);
+
+    // Redirect stdout to file using dup2
+    dup2(fd, STDOUT_FILENO);
+
+    // Write buffer to file (append)
+    write(STDOUT_FILENO, buffer, bytes);
+
+    printf("\nData appended successfully\n");
+
+    close(fd);
+    return 0;
+}
