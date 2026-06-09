@@ -20,17 +20,17 @@ int main() {
         return 1;
     }
 
-    // Parent process
+    
     if (pid > 0) {
         read(fd, buffer, 5);
         buffer[5] = '\0';
         printf("Parent read: %s\n", buffer);
 
-        sleep(1); // ensure order
+        sleep(1); 
     }
-    // Child process
+    
     else {
-        sleep(1); // wait for parent
+        sleep(1); 
 
         read(fd, buffer, 5);
         buffer[5] = '\0';

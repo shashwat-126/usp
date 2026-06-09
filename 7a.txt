@@ -10,14 +10,14 @@ int main() {
     int val = setjmp(env);
 
     if (val != 0) {
-        // After longjmp
+        
         printf("After longjmp:\n");
         printf("register variable = %d\n", reg_var);
         printf("volatile variable = %d\n", vol_var);
         return 0;
     }
 
-    // Modify variables
+    
     reg_var = 100;
     vol_var = 200;
 
@@ -25,7 +25,7 @@ int main() {
     printf("register variable = %d\n", reg_var);
     printf("volatile variable = %d\n", vol_var);
 
-    // Jump back
+   
     longjmp(env, 1);
 
     return 0;

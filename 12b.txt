@@ -12,10 +12,10 @@ int main() {
     }
 
     if (pid == 0) {
-        // Child process
+        
         printf("\nChild Process (PID: %d)\n", getpid());
 
-        // Custom environment variables
+        
         char *envp[] = {
             "USER=CustomUser",
             "PATH=/custom/bin",
@@ -27,12 +27,12 @@ int main() {
         perror("execle failed");
     } 
     else {
-        // Parent process
+       
         printf("\nParent Process (PID: %d)\n", getpid());
 
         wait(NULL);
 
-        // Parent uses default environment
+        
         execl("./echoall", "echoall", "ParentArg1", NULL);
 
         perror("execl failed");

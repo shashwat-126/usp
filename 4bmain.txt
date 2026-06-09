@@ -11,7 +11,7 @@ int main() {
     }
 
     if (pid == 0) {
-        // Child executes interpreter file
+        
         execl("./interpreter.sh", "interpreter.sh", "HelloFromChild", NULL);
         perror("execl failed");
     }

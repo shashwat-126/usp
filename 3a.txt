@@ -9,14 +9,14 @@ int main() {
     struct stat fileStat;
     char path[1024];
 
-    dir = opendir(".");  // current directory
+    dir = opendir(".");  
     if (dir == NULL) {
         perror("opendir failed");
         return 1;
     }
 
     while ((entry = readdir(dir)) != NULL) {
-        // Skip . and ..
+        
         if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
             continue;
 

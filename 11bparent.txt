@@ -12,18 +12,18 @@ int main() {
     }
 
     if (pid == 0) {
-        // Child process
+        
         printf("Child Process (PID: %d)\n", getpid());
 
-        // Execute add program
+        
         execl("./add", "add", "10", "20", NULL);
 
         perror("execl failed");
     } else {
-        // Parent process
+        
         printf("Parent Process (PID: %d)\n", getpid());
 
-        wait(NULL);  // wait for child
+        wait(NULL);  
         printf("Child process completed\n");
     }
 

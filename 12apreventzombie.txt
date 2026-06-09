@@ -6,7 +6,7 @@ int main() {
     pid_t pid = fork();
 
     if (pid > 0) {
-        wait(NULL);  // Collect child status
+        wait(NULL);  
         printf("Child terminated, no zombie\n");
     } 
     else if (pid == 0) {

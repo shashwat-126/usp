@@ -11,14 +11,14 @@ int main() {
         return 1;
     }
 
-    // Write using original fd
+    
     write(fd, "Original FD\n", 12);
 
-    // dup() → gets next available fd
+    
     fd_dup = dup(fd);
     write(fd_dup, "Written using dup()\n", 20);
 
-    // dup2() → force to specific fd (e.g., 5)
+   
     fd_dup2 = dup2(fd, 5);
     write(fd_dup2, "Written using dup2()\n", 21);
 

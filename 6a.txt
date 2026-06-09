@@ -16,20 +16,20 @@ int main() {
         return 1;
     }
 
-    // Read n characters
+    
     int bytes = read(fd, buffer, n);
     if (bytes < 0) {
         perror("read failed");
         return 1;
     }
 
-    // Move to end for appending
+    
     lseek(fd, 0, SEEK_END);
 
-    // Redirect stdout to file using dup2
+    
     dup2(fd, STDOUT_FILENO);
 
-    // Write buffer to file (append)
+   
     write(STDOUT_FILENO, buffer, bytes);
 
     printf("\nData appended successfully\n");

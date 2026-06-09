@@ -14,7 +14,7 @@ int main() {
         return 1;
     }
 
-    // Find file size
+    
     off_t size = lseek(fd, 0, SEEK_END);
     if (size == -1) {
         perror("lseek failed");
@@ -22,7 +22,7 @@ int main() {
         return 1;
     }
 
-    // Define safe lock region (last 100 bytes or whole file)
+    
     off_t lock_start = (size <= 100) ? 0 : size - 100;
     off_t lock_len   = (size < 100) ? size : 100;
 
@@ -32,7 +32,7 @@ int main() {
     lock.l_len = lock_len;
     lock.l_pid = getpid();
 
-    // Check existing lock
+    
     if (fcntl(fd, F_GETLK, &lock) == -1) {
         perror("fcntl F_GETLK failed");
         close(fd);
@@ -44,7 +44,7 @@ int main() {
     } else {
         printf("Region is not locked. Locking now...\n");
 
-        // Apply lock
+        
         lock.l_type = F_WRLCK;
 
         if (fcntl(fd, F_SETLK, &lock) == -1) {
@@ -53,7 +53,7 @@ int main() {
             return 1;
         }
 
-        // Safe read last 50 bytes
+        
         off_t read_start = (size <= 50) ? 0 : size - 50;
 
         if (lseek(fd, read_start, SEEK_SET) == -1) {
@@ -73,7 +73,6 @@ int main() {
 
         printf("Last %d bytes:\n%s\n", bytes, buffer);
 
-        // Unlock region
         lock.l_type = F_UNLCK;
 
         if (fcntl(fd, F_SETLK, &lock) == -1) {
@@ -89,4 +88,4 @@ int main() {
     return 0;
 }
 
-//need modification on github
+
